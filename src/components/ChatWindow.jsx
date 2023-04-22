@@ -69,11 +69,15 @@ const ChatWindow = ({ userName }) => {
 
     const socketInitializer = async () => {
 
-        socket = io('http://localhost:8000')
+        socket = io('http://localhost:8000', {
+            query: {
+                "user-name": userName
+            }
+        });
 
         socket.on('connect', () => {
             console.log('connected')
-        })
+        });
 
         socket.on('chat message', msg => {
 
@@ -86,17 +90,23 @@ const ChatWindow = ({ userName }) => {
                 return newMsgs;
             })
 
-        })
+        });
 
         socket.on('color', colorMsg => {
 
             color = colorMsg;
 
+        });
+
+        socket.on('messages init', messagesInit => {
+
+            setMessages(messagesInit);
+
         })
 
         socket.on('connect_error', (err) => {
             console.log('connect error due to:', err.message)
-        })
+        });
     }
 
     return (
@@ -105,6 +115,14 @@ const ChatWindow = ({ userName }) => {
             <div className="w-full h-full bg-slate-600 rounded-xl shadow-inner shadow-slate-800/30 overflow-hidden">
                 <ul className="flex flex-col gap-2 p-2 overflow-auto h-full w-full">
                     {messages.map((msg, index) => {
+
+                        const time = new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                        if (msg.serverMessage) {
+
+                            return <li key={`msg${index}`} className="flex justify-center items-center text-xs text-slate-400 pt-2">{msg.user} {msg.action} @ {time}</li>
+
+                        }
 
                         let color = 'bg-slate-500';
                         let align = 'justify-start';
@@ -118,11 +136,9 @@ const ChatWindow = ({ userName }) => {
 
                         }
 
-                        let time = new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
                         return (
 
-                            <div key={`msg${index}`} className={`flex w-full ${align}`}>
+                            <li key={`msg${index}`} className={`flex w-full ${align}`}>
                                 <div className={`flex w-3/4 ${align}`}>
                                     <div className="grid grid-cols-[1rem_auto] items-end gap-4">
                                         {!msg.self && <div className={`flex justify-center items-center w-6 h-6 mb-0.5 text-lg ${colors[msg.color]} text-slate-200 rounded-full`}>{msg.sender[0].toUpperCase()}</div>}
@@ -132,7 +148,7 @@ const ChatWindow = ({ userName }) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </li>
                         )
                     })}
                     <li ref={scrollRef}></li>
