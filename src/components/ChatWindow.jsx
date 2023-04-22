@@ -19,7 +19,7 @@ const ChatWindow = ({ userName }) => {
         const newMsg = {
             sender: userName,
             message: inputRef.current.value,
-            time: '12.00',
+            time: Date.now(),
         }
         socket.emit('chat message', newMsg)
         setMessages((oldMsgs) => {
@@ -87,11 +87,14 @@ const ChatWindow = ({ userName }) => {
 
                     }
 
+                    let time = new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
                     return (
+
                         <div key={`msg${index}`} className={`flex w-full ${align}`}>
                             <div className={`flex w-3/4 ${align}`}>
                                 <div>
-                                    <div className="flex justify-between gap-2 text-xs text-slate-300 p-2"><div>{sender}</div><div>{msg.time}</div></div>
+                                    <div className="flex justify-between gap-2 text-xs text-slate-300 p-2"><div>{sender}</div><div>{time}</div></div>
                                     <div className={`${color} rounded-xl p-3 text-slate-100 w-fit shadow shadow-slate-800/30`}>{msg.message}</div>
                                 </div>
                             </div>
