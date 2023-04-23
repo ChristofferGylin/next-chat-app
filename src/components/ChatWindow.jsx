@@ -69,7 +69,7 @@ const ChatWindow = ({ userName }) => {
 
     const socketInitializer = async () => {
 
-        socket = io('http://localhost:8000', {
+        socket = io('http://143.42.28.233:8000', {
             query: {
                 "user-name": userName
             }
